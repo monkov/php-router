@@ -1,2 +1,2 @@
 # php-router
-Hello guys)
+Hello guys, wiki is [here](https://github.com/monkov/php-router/wiki)
