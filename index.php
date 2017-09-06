@@ -2,7 +2,7 @@
 	//Include router file
 	include "core/Router.php";
 	//BaseUrl
-	$baseUrl = "/model";
+	$baseUrl = "";
 	//some handles
 	function home() {
 		echo "Home page";

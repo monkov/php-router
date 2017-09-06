@@ -5,11 +5,12 @@
 		public $baseUrl = "/";
 		//public $mod = 0; //dynamic = 1 mod = 0
 
-		public function __construct( $routs, $baseUrl ) {
+		public function __construct( $routs, $baseUrl = "") {
 			$this->setBaseUrl( $baseUrl );
 			$this->setRouts( $routs );
-			$this->setRequest( $_SERVER["REQUEST_URI"] );
-			$this->execute();
+			if ($this->setRequest( $_SERVER["REQUEST_URI"] ) !== false) {
+				$this->execute();
+			}
 		}
 
 		/**
@@ -18,14 +19,20 @@
 		public function setBaseUrl( string $baseUrl ) {
 			$this->baseUrl = $baseUrl;
 		}
-
 		/**
 		 * @param array $request
 		 */
 		public function setRequest( $request ) {
-			$request = str_replace($this->baseUrl, "", $request);
-			$request       = $this->makeReq( $request );
-			$this->request = $request;
+			if ($this->baseUrl != "" && stristr($request, $this->baseUrl)) {
+				$request = str_replace($this->baseUrl, "", $request);
+				$request       = $this->makeReq( $request );
+				$this->request = $request;
+			}elseif($this->baseUrl == "") {
+				$request       = $this->makeReq( $request );
+				$this->request = $request;
+			}else {
+				return false;
+			}
 		}
 
 		private function getType( $req ) {
@@ -56,9 +63,18 @@
 			if ($handle = $this->is_permalink()) {
 				$handle();
 			}elseif($handle = $this->is_dynamiclink()) {
-				$handle[0]($handle[1][0]);
+				$handle[0]($this->getHandle($handle[1]));
 			}else {
 				$this->error("404", "Not found");
+			}
+		}
+		private function getHandle($handle) {
+			if (count($handle) == 1) {
+				return $handle[0];
+			}elseif (count($handle) == 0) {
+				return "";
+			}elseif (count($handle) > 1) {
+				return $handle;
 			}
 		}
 		private function error($code, $status) {
